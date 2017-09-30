@@ -38,7 +38,6 @@ namespace Nats.Services.Core
                 else
                 {
                     var reply = connection.Request(subject, payload, 1000);
-                    var str = serializer.ToString(reply.Data);
                     var dicoResult = serializer.Deserialize(reply.Data);
 
                     invocation.ReturnValue = dicoResult[ResultKey];
