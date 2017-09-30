@@ -41,7 +41,7 @@ namespace Nats.Services.Core
                     var str = serializer.ToString(reply.Data);
                     var dicoResult = serializer.Deserialize(reply.Data);
 
-                    invocation.ReturnValue = dicoResult["result"];
+                    invocation.ReturnValue = dicoResult[ResultKey];
                 }
 
             }

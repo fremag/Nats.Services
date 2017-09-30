@@ -11,6 +11,7 @@ namespace Nats.Services.Core
         protected NatsServiceSerializer<T> serializer = new NatsServiceSerializer<T>();
         protected IConnection connection;
         protected List<IAsyncSubscription> subscriptions = new List<IAsyncSubscription>();
+        protected readonly string ResultKey = "result";
 
         public AbstractNatsService(IConnection connection)
         {

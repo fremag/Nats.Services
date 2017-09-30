@@ -55,7 +55,7 @@ namespace Nats.Services.Core
                 if(! string.IsNullOrEmpty(e.Message.Reply))
                 {
                     Dictionary<string, object> dicoResult = new Dictionary<string, object>();
-                    dicoResult["result"] = result;
+                    dicoResult[ResultKey] = result;
                     var payload = serializer.Serialize(dicoResult);
                     asyncSub.Connection.Publish(e.Message.Reply, payload);
                 }
