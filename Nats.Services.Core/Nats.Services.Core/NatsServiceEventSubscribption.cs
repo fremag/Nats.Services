@@ -1,17 +1,18 @@
 ﻿using NATS.Client;
 using System;
+using System.Reflection;
 
 namespace Nats.Services.Core
 {
     public class NatsServiceEventSubscribption<T>
     {
-        private NatsServiceSerializer<T> Serializer { get; set; }
         private string Subject { get; set; }
-        private MulticastDelegate EventCallback;
+        private MulticastDelegate EventCallback { get; set; }
+        private Func<MethodInfo, byte[], object[]> PayloadDecoder { get; set; }
 
-        public NatsServiceEventSubscribption(NatsServiceSerializer<T> serializer, string subject, MulticastDelegate eventCallback)
+        public NatsServiceEventSubscribption(Func<MethodInfo, byte[], object[]> payloadDecoder, string subject, MulticastDelegate eventCallback)
         {
-            Serializer = serializer;
+            PayloadDecoder = payloadDecoder;
             Subject = subject;
             EventCallback = eventCallback;
         }
@@ -19,7 +20,7 @@ namespace Nats.Services.Core
         internal void OnMessage(object sender, MsgHandlerEventArgs args)
         {
             IAsyncSubscription sub = sender as IAsyncSubscription;
-            var values = Serializer.Deserialize(args.Message.Data);
+            var values = PayloadDecoder(EventCallback.Method, args.Message.Data);
             EventCallback.DynamicInvoke(values);
         }
     }

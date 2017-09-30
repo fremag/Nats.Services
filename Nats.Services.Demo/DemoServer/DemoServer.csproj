@@ -10,4 +10,9 @@
     <PackageReference Include="NATS.Client" Version="0.8.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Nats.Services.Core\Nats.Services.Core\Nats.Services.Core.csproj" />
+    <ProjectReference Include="..\DemoService\DemoService.csproj" />
+  </ItemGroup>
+
 </Project>

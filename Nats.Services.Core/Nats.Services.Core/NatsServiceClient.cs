@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using NATS.Client;
 using Castle.DynamicProxy;
 using System.Linq;
@@ -23,8 +21,9 @@ namespace Nats.Services.Core
                 {
                     var deleg = invocation.Arguments[0] as MulticastDelegate;
                     var eventsubject = GetSubject(myEvent.Name);
-                    var sub = new NatsServiceEventSubscribption<T>(serializer, eventsubject, deleg);
+                    var sub = new NatsServiceEventSubscribption<T>(DecodePayload, eventsubject, deleg);
                     SubscribeAsync(eventsubject, sub.OnMessage);
+                    return;
                 }
             }
 
@@ -35,11 +34,14 @@ namespace Nats.Services.Core
                 if( invocation.Method.ReturnType == typeof(void))
                 {
                     connection.Publish(subject, payload);
-                } else
+                }
+                else
                 {
                     var reply = connection.Request(subject, payload, 1000);
-                    var result = serializer.DeserializeObject(reply.Data);
-                    invocation.ReturnValue = result;
+                    var str = serializer.ToString(reply.Data);
+                    var dicoResult = serializer.Deserialize(reply.Data);
+
+                    invocation.ReturnValue = dicoResult["result"];
                 }
 
             }

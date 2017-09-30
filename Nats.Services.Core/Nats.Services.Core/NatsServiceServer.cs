@@ -54,7 +54,9 @@ namespace Nats.Services.Core
                 var result = methInfo.Invoke(serviceImpl, parameters);
                 if(! string.IsNullOrEmpty(e.Message.Reply))
                 {
-                    var payload = serializer.Serialize(result);
+                    Dictionary<string, object> dicoResult = new Dictionary<string, object>();
+                    dicoResult["result"] = result;
+                    var payload = serializer.Serialize(dicoResult);
                     asyncSub.Connection.Publish(e.Message.Reply, payload);
                 }
             }
