@@ -12,15 +12,26 @@ namespace Nats.Services.Core
         protected IConnection connection;
         protected List<IAsyncSubscription> subscriptions = new List<IAsyncSubscription>();
         protected readonly string ResultKey = "result";
+        private string ServiceName { get; }
 
         public AbstractNatsService(IConnection connection)
         {
             this.connection = connection;
+            var attrib = typeof(T).GetCustomAttribute(typeof(NatsServiceAttribute)) as NatsServiceAttribute;
+            if (attrib == null)
+            {
+                ServiceName = typeof(T).FullName;
+            }
+            else
+            {
+                ServiceName = attrib.ServiceName;
+            }
+
         } 
 
         public string GetSubject(string name)
         {
-            return $"{typeof(T).FullName}.{name}";
+            return $"{ServiceName}.{name}";
         }
 
         public byte[] BuildPayload(IInvocation invoc)
