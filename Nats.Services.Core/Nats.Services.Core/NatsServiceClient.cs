@@ -2,27 +2,32 @@
 using NATS.Client;
 using Castle.DynamicProxy;
 using System.Linq;
+using System.Reflection;
+using NLog;
 
 namespace Nats.Services.Core
 {
     public class NatsServiceClient<T> : AbstractNatsService<T>, IInterceptor
     {
+        static Logger logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType.FullName);
+
         public NatsServiceClient(IConnection connection) : base(connection)
         {
-
+            if (logger.IsDebugEnabled) logger.Debug($"NatsServiceClient: {typeof(T).Name}");
         }
 
         public void Intercept(IInvocation invocation)
         {
             if (invocation.Method.IsSpecialName)
             {
-                var myEvent = typeof(T).GetEvents().FirstOrDefault(evt => evt.AddMethod.Name == invocation.Method.Name);
-                if (myEvent != null)
+                var eventInfo = typeof(T).GetEvents().FirstOrDefault(evt => evt.AddMethod.Name == invocation.Method.Name);
+                if (eventInfo != null)
                 {
                     var deleg = invocation.Arguments[0] as MulticastDelegate;
-                    var eventsubject = GetSubject(myEvent.Name);
+                    var eventsubject = GetSubject(eventInfo.Name);
                     var sub = new NatsServiceEventSubscribption<T>(DecodePayload, eventsubject, deleg);
-                    SubscribeAsync(eventsubject, sub.OnMessage);
+                    var asyncSub = SubscribeAsync(eventsubject, sub.OnMessage);
+                    if (logger.IsDebugEnabled) logger.Debug($"NatsServiceClient: {typeof(T)}, Event: {eventInfo.Name}, subject: {asyncSub.Subject}");
                     return;
                 }
             }
@@ -31,7 +36,8 @@ namespace Nats.Services.Core
             {
                 var payload = BuildPayload(invocation);
                 var subject = GetSubject(invocation.Method.Name);
-                if( invocation.Method.ReturnType == typeof(void))
+                if (logger.IsDebugEnabled) logger.Debug($"NatsServiceClient: {typeof(T)}, Method: {invocation.Method.Name}, subject: {subject}, parameters: {serializer.ToString(payload)}");
+                if ( invocation.Method.ReturnType == typeof(void))
                 {
                     connection.Publish(subject, payload);
                 }
@@ -41,8 +47,8 @@ namespace Nats.Services.Core
                     var dicoResult = serializer.Deserialize(reply.Data);
 
                     invocation.ReturnValue = dicoResult[ResultKey];
+                    if (logger.IsDebugEnabled) logger.Debug($"NatsServiceClient: {typeof(T)}, Method: {invocation.Method.Name}, result: {serializer.ToString(reply.Data)}");
                 }
-
             }
         }
     }

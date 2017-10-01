@@ -23,7 +23,7 @@ namespace Nats.Services.Core
             return $"{typeof(T).FullName}.{name}";
         }
 
-        protected byte[] BuildPayload(IInvocation invoc)
+        public byte[] BuildPayload(IInvocation invoc)
         {
             var paramsInfo = invoc.Method.GetParameters();
             var dico = new Dictionary<string, object>();
@@ -37,7 +37,14 @@ namespace Nats.Services.Core
             return payload;
         }
 
-        protected object[] DecodePayload(MethodInfo methInfo, byte[] payload)
+        public string ToString(IInvocation invoc)
+        {
+            var payload = BuildPayload(invoc);
+            var str = serializer.ToString(payload);
+            return str;
+        }
+
+        public object[] DecodePayload(MethodInfo methInfo, byte[] payload)
         {
             Dictionary<string, object> dico = serializer.Deserialize(payload);
             var parameters = methInfo.GetParameters();

@@ -6,12 +6,15 @@ using Castle.DynamicProxy;
 using System.Reflection;
 using System.Linq;
 using Castle.DynamicProxy.Generators;
+using NLog;
 
 namespace Nats.Services.Core
 {
     public class NatsServiceServer<T> : AbstractNatsService<T>
     {
         private static ProxyGenerator generator = new ProxyGenerator();
+        static Logger logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType.FullName);
+
         private T serviceImpl;
         private Dictionary<IAsyncSubscription, MethodInfo> dicoMethodInfoBySubscription = new Dictionary<IAsyncSubscription, MethodInfo>();
 
@@ -24,6 +27,7 @@ namespace Nats.Services.Core
             {
                 var subject = GetSubject(methInfo.Name);
                 var asyncSub = SubscribeAsync(subject, OnMessage);
+                if (logger.IsDebugEnabled) logger.Debug($"NatsServiceServer: {typeof(T)}, Method: {methInfo.Name}, subject: {asyncSub.Subject}");
                 dicoMethodInfoBySubscription[asyncSub] = methInfo;
             }
 
@@ -35,12 +39,13 @@ namespace Nats.Services.Core
                 {
                     var delegType = eventInfo.EventHandlerType;
                     var delegGen = new DelegateProxyGenerator(scope, delegType);
-                    var eventInterceptor = new EventInterceptor<T>(eventInfo.Name, connection, GetSubject(eventInfo.Name), BuildPayload);
+                    var eventInterceptor = new EventInterceptor<T>(eventInfo.Name, connection, GetSubject(eventInfo.Name), this);
                     object nullFunc = Convert.ChangeType(null, delegType);
                     var proxyType = delegGen.GetProxyType();
                     var instance = Activator.CreateInstance(proxyType, nullFunc, new IInterceptor[] { eventInterceptor });
                     var deleg = Delegate.CreateDelegate(delegType, instance, "Invoke");
                     eventInfo.GetAddMethod().Invoke(serviceImpl, new object[] { deleg });
+                    if (logger.IsDebugEnabled) logger.Debug($"NatsServiceServer: {typeof(T)}, Event: {eventInfo.Name}");
                 }
             }
         }
@@ -50,6 +55,7 @@ namespace Nats.Services.Core
             var asyncSub = sender as IAsyncSubscription;
             if( dicoMethodInfoBySubscription.TryGetValue(asyncSub, out MethodInfo methInfo))
             {
+                if (logger.IsDebugEnabled) logger.Debug($"Method called: {methInfo.Name}, Parameters: {serializer.ToString(e.Message.Data)}");
                 object[] parameters = DecodePayload(methInfo, e.Message.Data);
                 var result = methInfo.Invoke(serviceImpl, parameters);
                 if(! string.IsNullOrEmpty(e.Message.Reply))
@@ -57,6 +63,7 @@ namespace Nats.Services.Core
                     Dictionary<string, object> dicoResult = new Dictionary<string, object>();
                     dicoResult[ResultKey] = result;
                     var payload = serializer.Serialize(dicoResult);
+                    if (logger.IsDebugEnabled) logger.Debug($"Method: {methInfo.Name}, Returns: {serializer.ToString(payload)}");
                     asyncSub.Connection.Publish(e.Message.Reply, payload);
                 }
             }

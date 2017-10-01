@@ -1,27 +1,31 @@
 ﻿using Castle.DynamicProxy;
 using NATS.Client;
-using System;
+using NLog;
+using System.Reflection;
 
 namespace Nats.Services.Core
 {
     public class EventInterceptor<T> : IInterceptor
     {
+        static Logger logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType.FullName);
+
         private string name;
         private IConnection connection;
         private string subject;
-        private Func<IInvocation, byte[]> payloadBuilder;
+        private AbstractNatsService<T> natsService;
 
-        public EventInterceptor(string name, IConnection connection, string subject, Func<IInvocation, byte[]> payloadBuilder)
+        public EventInterceptor(string name, IConnection connection, string subject, AbstractNatsService<T> natsService)
         {
             this.name = name;
             this.connection = connection;
             this.subject = subject;
-            this.payloadBuilder = payloadBuilder;
+            this.natsService = natsService;
         }
 
         public void Intercept(IInvocation invocation)
         {
-            byte[] payload = payloadBuilder(invocation);
+            if (logger.IsDebugEnabled) logger.Debug($"FireEvent: {name}, subject: {subject}, args: {natsService.ToString(invocation)}");
+            byte[] payload = natsService.BuildPayload(invocation);
             connection.Publish(subject, payload);
         }
     }
