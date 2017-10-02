@@ -5,7 +5,7 @@ namespace Nats.Services.Core
 {
     public class NatsServiceFactory
     {
-        private static ProxyGenerator genertor = new ProxyGenerator();
+        private static ProxyGenerator generator = new ProxyGenerator();
         private IConnection connection;
 
         public NatsServiceFactory(IConnection connection)
@@ -15,7 +15,7 @@ namespace Nats.Services.Core
 
         public T BuildServiceClient<T>() where T: class
         {
-            return genertor.CreateInterfaceProxyWithoutTarget<T>(new NatsServiceClient<T>(connection));
+            return generator.CreateInterfaceProxyWithoutTarget<T>(new NatsServiceClient<T>(connection));
         }
 
         public T BuildServiceServer<T>(T serviceImpl)

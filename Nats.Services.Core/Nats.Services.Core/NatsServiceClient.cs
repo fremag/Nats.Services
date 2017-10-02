@@ -25,7 +25,7 @@ namespace Nats.Services.Core
                 {
                     var deleg = invocation.Arguments[0] as MulticastDelegate;
                     var eventsubject = GetSubject(eventInfo.Name);
-                    var sub = new NatsServiceEventSubscribption<T>(DecodePayload, eventsubject, deleg);
+                    var sub = new NatsServiceEventSubscribtion<T>(DecodePayload, eventsubject, deleg);
                     var asyncSub = SubscribeAsync(eventsubject, sub.OnMessage);
                     if (logger.IsDebugEnabled) logger.Debug($"NatsServiceClient: {typeof(T)}, Event: {eventInfo.Name}, subject: {asyncSub.Subject}");
                     return;
