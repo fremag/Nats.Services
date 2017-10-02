@@ -25,12 +25,11 @@ namespace Nats.Services.Core
 
             foreach(var methInfo in typeof(T).GetMethods())
             {
-                var subject = GetSubject(methInfo.Name);
+                var subject = GetListenSubject(methInfo);
                 var asyncSub = SubscribeAsync(subject, OnMessage);
                 if (logger.IsDebugEnabled) logger.Debug($"NatsServiceServer: {typeof(T)}, Method: {methInfo.Name}, subject: {asyncSub.Subject}");
                 dicoMethodInfoBySubscription[asyncSub] = methInfo;
             }
-
 
             if (typeof(T).GetEvents().Any())
             {
@@ -39,7 +38,7 @@ namespace Nats.Services.Core
                 {
                     var delegType = eventInfo.EventHandlerType;
                     var delegGen = new DelegateProxyGenerator(scope, delegType);
-                    var eventInterceptor = new EventInterceptor<T>(eventInfo.Name, connection, GetSubject(eventInfo.Name), this);
+                    var eventInterceptor = new EventInterceptor<T>(eventInfo.Name, connection, GetPublishSubject(eventInfo), this);
                     object nullFunc = Convert.ChangeType(null, delegType);
                     var proxyType = delegGen.GetProxyType();
                     var instance = Activator.CreateInstance(proxyType, nullFunc, new IInterceptor[] { eventInterceptor });

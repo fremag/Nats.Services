@@ -24,7 +24,7 @@ namespace Nats.Services.Core
                 if (eventInfo != null)
                 {
                     var deleg = invocation.Arguments[0] as MulticastDelegate;
-                    var eventsubject = GetSubject(eventInfo.Name);
+                    var eventsubject = GetListenSubject(eventInfo);
                     var sub = new NatsServiceEventSubscribtion<T>(DecodePayload, eventsubject, deleg);
                     var asyncSub = SubscribeAsync(eventsubject, sub.OnMessage);
                     if (logger.IsDebugEnabled) logger.Debug($"NatsServiceClient: {typeof(T)}, Event: {eventInfo.Name}, subject: {asyncSub.Subject}");
@@ -35,7 +35,7 @@ namespace Nats.Services.Core
             if(typeof(T).GetMethods().Any(method => method.Name == invocation.Method.Name))
             {
                 var payload = BuildPayload(invocation);
-                var subject = GetSubject(invocation.Method.Name);
+                var subject = GetPublishSubject(invocation.Method);
                 if (logger.IsDebugEnabled) logger.Debug($"NatsServiceClient: {typeof(T)}, Method: {invocation.Method.Name}, subject: {subject}, parameters: {serializer.ToString(payload)}");
                 if ( invocation.Method.ReturnType == typeof(void))
                 {

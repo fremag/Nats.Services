@@ -26,12 +26,23 @@ namespace Nats.Services.Core
             {
                 ServiceName = attrib.ServiceName;
             }
-
         } 
 
-        public string GetSubject(string name)
+        public string GetListenSubject(MemberInfo memberInfo)
         {
-            return $"{ServiceName}.{name}";
+            string name = IsMemberGlobal(memberInfo) ? "*" : ServiceName;
+            return $"{name}.{memberInfo.Name}";
+        }
+
+        private bool IsMemberGlobal(MemberInfo memberInfo)
+        {
+            return memberInfo.GetCustomAttribute<NatsServiceGlobalAttribute>() != null;
+        }
+
+        public string GetPublishSubject(MemberInfo memberInfo)
+        {
+            string name = IsMemberGlobal(memberInfo) ? "ANYONE" : ServiceName;
+            return $"{name}.{memberInfo.Name}";
         }
 
         public byte[] BuildPayload(IInvocation invoc)
