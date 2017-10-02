@@ -4,7 +4,10 @@
 
     public interface IDiscoveryService
     {
+        [NatsServiceGlobal]
         event EchoDelegate EchoEvent;
+
+        [NatsServiceGlobal]
         void Sonar();
     }
 }

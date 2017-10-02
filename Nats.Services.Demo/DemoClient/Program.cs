@@ -1,5 +1,6 @@
 ﻿using DemoService;
 using Nats.Services.Core;
+using Nats.Services.Core.DiscoveryService;
 using NATS.Client;
 using NLog;
 using NLog.Config;
@@ -19,7 +20,7 @@ namespace DemoClient
             var config = new LoggingConfiguration();
             var consoleTarget = new ColoredConsoleTarget();
             config.AddTarget("console", consoleTarget);
-            var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
+            var rule1 = new LoggingRule("*", LogLevel.Info, consoleTarget);
             config.LoggingRules.Add(rule1);
             LogManager.Configuration = config;
 
@@ -28,18 +29,42 @@ namespace DemoClient
 
             using (var connection = new ConnectionFactory().CreateConnection(options))
             {
-                string agentName = "TestServer";
+                var serverName = DiscoverServer(connection);
+                var serviceFactory = new NatsServiceFactory(connection, serverName);
 
-                var serviceFactory = new NatsServiceFactory(connection, agentName);
                 IDemoService service = serviceFactory.BuildServiceClient<IDemoService>();
-
                 service.StatusUpdatedEvent += OnStatusUpdated;
 
-                Timer timer = new Timer(OnTimer, service, 1000, 2000);
+                Timer timer = new Timer(OnTimer, service, 1000, 3000);
 
                 logger.Info("Client started !");
                 Console.ReadKey();
+
             }
+        }
+
+        private static string DiscoverServer(IConnection connection)
+        {
+            var serviceFactory = new NatsServiceFactory(connection, "Unknown");
+            var discoveryService = serviceFactory.BuildServiceClient<IDiscoveryService>();
+            string agentName = null;
+            bool serverFound = false;
+
+            discoveryService.EchoEvent += name =>
+            {
+                agentName = name;
+                serverFound = true;
+            };
+
+            while(! serverFound)
+            {
+                logger.Info("Looking for a server...");
+                discoveryService.Sonar();
+                Thread.Sleep(1000);
+            }
+
+            logger.Info("Server found: "+agentName);
+            return agentName;
         }
 
         private static void OnTimer(object state)
