@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using NATS.Client;
 using Castle.DynamicProxy;
 using System.Reflection;
@@ -18,7 +17,7 @@ namespace Nats.Services.Core
         private T serviceImpl;
         private Dictionary<IAsyncSubscription, MethodInfo> dicoMethodInfoBySubscription = new Dictionary<IAsyncSubscription, MethodInfo>();
 
-        public NatsServiceServer(IConnection connection, T serviceImpl) : base(connection)
+        public NatsServiceServer(IConnection connection, T serviceImpl, string agentName) : base(connection, agentName)
         {
             this.connection = connection;
             this.serviceImpl = serviceImpl;

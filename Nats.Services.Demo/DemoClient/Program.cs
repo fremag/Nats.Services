@@ -28,8 +28,9 @@ namespace DemoClient
 
             using (var connection = new ConnectionFactory().CreateConnection(options))
             {
+                string agentName = "TestServer";
 
-                var serviceFactory = new NatsServiceFactory(connection);
+                var serviceFactory = new NatsServiceFactory(connection, agentName);
                 IDemoService service = serviceFactory.BuildServiceClient<IDemoService>();
 
                 service.StatusUpdatedEvent += OnStatusUpdated;

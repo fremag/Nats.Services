@@ -11,9 +11,9 @@ namespace Nats.Services.Core
     {
         static Logger logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType.FullName);
 
-        public NatsServiceClient(IConnection connection) : base(connection)
+        public NatsServiceClient(IConnection connection, string agentName) : base(connection, agentName)
         {
-            if (logger.IsDebugEnabled) logger.Debug($"NatsServiceClient: {typeof(T).Name}");
+            if (logger.IsDebugEnabled) logger.Debug($"NatsServiceClient: {typeof(T).Name}, AgentName: {AgentName}");
         }
 
         public void Intercept(IInvocation invocation)

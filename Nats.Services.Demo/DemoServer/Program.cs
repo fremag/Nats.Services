@@ -28,7 +28,7 @@ namespace DemoServer
             {
                 var serviceImpl = new DemoServiceImpl();
                 serviceImpl.StatusUpdatedEvent += status => logger.Info($"Send status: {status}");
-                var serviceFactory = new NatsServiceFactory(connection);
+                var serviceFactory = new NatsServiceFactory(connection, "TestServer");
                 var natsServer = serviceFactory.BuildServiceServer<IDemoService>(serviceImpl);
 
                 Console.ReadKey();

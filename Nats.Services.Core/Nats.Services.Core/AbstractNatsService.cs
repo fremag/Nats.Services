@@ -8,16 +8,20 @@ namespace Nats.Services.Core
 {
     public abstract class AbstractNatsService<T> 
     {
+        public string AgentName { get; }
+        public string ServiceName { get; }
+
         protected NatsServiceSerializer<T> serializer = new NatsServiceSerializer<T>();
         protected IConnection connection;
         protected List<IAsyncSubscription> subscriptions = new List<IAsyncSubscription>();
         protected readonly string ResultKey = "result";
-        private string ServiceName { get; }
 
-        public AbstractNatsService(IConnection connection)
+        public AbstractNatsService(IConnection connection, string agentName)
         {
             this.connection = connection;
-            var attrib = typeof(T).GetCustomAttribute(typeof(NatsServiceAttribute)) as NatsServiceAttribute;
+            AgentName = agentName;
+
+            var attrib = typeof(T).GetCustomAttribute<NatsServiceAttribute>();
             if (attrib == null)
             {
                 ServiceName = typeof(T).FullName;
@@ -30,8 +34,8 @@ namespace Nats.Services.Core
 
         public string GetListenSubject(MemberInfo memberInfo)
         {
-            string name = IsMemberGlobal(memberInfo) ? "*" : ServiceName;
-            return $"{name}.{memberInfo.Name}";
+            string name = IsMemberGlobal(memberInfo) ? "*" : AgentName;
+            return $"{name}.{ServiceName}.{memberInfo.Name}";
         }
 
         private bool IsMemberGlobal(MemberInfo memberInfo)
@@ -41,8 +45,8 @@ namespace Nats.Services.Core
 
         public string GetPublishSubject(MemberInfo memberInfo)
         {
-            string name = IsMemberGlobal(memberInfo) ? "ANYONE" : ServiceName;
-            return $"{name}.{memberInfo.Name}";
+            string name = IsMemberGlobal(memberInfo) ? "ANYONE" : AgentName;
+            return $"{name}.{ServiceName}.{memberInfo.Name}";
         }
 
         public byte[] BuildPayload(IInvocation invoc)
