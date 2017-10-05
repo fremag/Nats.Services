@@ -20,7 +20,7 @@ namespace Nats.Services.Core
         {
             if (invocation.Method.IsSpecialName)
             {
-                var eventInfo = typeof(T).GetEvents().FirstOrDefault(evt => evt.AddMethod.Name == invocation.Method.Name);
+                var eventInfo = GetEventInfo(invocation.Method.Name);
                 if (eventInfo != null)
                 {
                     var deleg = invocation.Arguments[0] as MulticastDelegate;
@@ -32,7 +32,7 @@ namespace Nats.Services.Core
                 }
             }
 
-            if(typeof(T).GetMethods().Any(method => method.Name == invocation.Method.Name))
+            if(GetMethodInfo(invocation.Method.Name) != null)
             {
                 var payload = BuildPayload(invocation);
                 var subject = GetPublishSubject(invocation.Method);

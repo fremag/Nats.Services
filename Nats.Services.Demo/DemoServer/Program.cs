@@ -17,7 +17,7 @@ namespace DemoServer
             var config = new LoggingConfiguration();
             var consoleTarget = new ColoredConsoleTarget();
             config.AddTarget("console", consoleTarget);
-            var rule1 = new LoggingRule("*", LogLevel.Info, consoleTarget);
+            var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
             config.LoggingRules.Add(rule1);
             LogManager.Configuration = config;
             var logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType.FullName);
