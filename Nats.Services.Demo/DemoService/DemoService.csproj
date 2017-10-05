@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Nats.Services.Core\Nats.Services.Core\Nats.Services.Core.csproj" />
+    <ProjectReference Include="..\..\Nats.Services.Core\Nats.Services.Core.csproj" />
   </ItemGroup>
 
 </Project>
