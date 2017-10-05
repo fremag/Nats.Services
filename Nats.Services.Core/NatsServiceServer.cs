@@ -58,9 +58,7 @@ namespace Nats.Services.Core
                 var result = methInfo.Invoke(serviceImpl, parameters);
                 if(! string.IsNullOrEmpty(e.Message.Reply))
                 {
-                    Dictionary<string, object> dicoResult = new Dictionary<string, object>();
-                    dicoResult[ResultKey] = result;
-                    var payload = serializer.Serialize(dicoResult);
+                    var payload = serializer.SerializeReturnObject(result);
                     if (logger.IsDebugEnabled) logger.Debug($"Method: {methInfo.Name}, Returns: {serializer.ToString(payload)}");
                     asyncSub.Connection.Publish(e.Message.Reply, payload);
                 }

@@ -14,7 +14,6 @@ namespace Nats.Services.Core
         protected NatsServiceSerializer<T> serializer = new NatsServiceSerializer<T>();
         protected IConnection connection;
         protected List<IAsyncSubscription> subscriptions = new List<IAsyncSubscription>();
-        protected readonly string ResultKey = "result";
 
         public AbstractNatsService(IConnection connection, string agentName)
         {
@@ -59,7 +58,7 @@ namespace Nats.Services.Core
                 var arg = invoc.Arguments[i];
                 dico[paramInfo.Name] = arg;
             }
-            var payload = serializer.Serialize(dico);
+            var payload = serializer.SerializeMethodArguments(dico);
             return payload;
         }
 
@@ -72,7 +71,7 @@ namespace Nats.Services.Core
 
         public object[] DecodePayload(MethodInfo methInfo, byte[] payload)
         {
-            Dictionary<string, object> dico = serializer.Deserialize(payload);
+            Dictionary<string, object> dico = serializer.DeserializeMethodArguments(payload);
             var parameters = methInfo.GetParameters();
             object[] values = new object[parameters.Length];
             for(int i=0; i < parameters.Length; i++)

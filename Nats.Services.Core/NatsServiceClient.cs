@@ -44,9 +44,9 @@ namespace Nats.Services.Core
                 else
                 {
                     var reply = connection.Request(subject, payload, 1000);
-                    var dicoResult = serializer.Deserialize(reply.Data);
+                    var result = serializer.DeserializeReturnObject(invocation.Method.ReturnType, reply.Data);
 
-                    invocation.ReturnValue = dicoResult[ResultKey];
+                    invocation.ReturnValue = result;
                     if (logger.IsDebugEnabled) logger.Debug($"NatsServiceClient: {typeof(T)}, Method: {invocation.Method.Name}, result: {serializer.ToString(reply.Data)}");
                 }
             }

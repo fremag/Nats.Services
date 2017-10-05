@@ -8,6 +8,7 @@ namespace Nats.Services.Core
     public class NatsServiceSerializer<T>
     {
         DataContractJsonSerializer serializer;
+        Dictionary<Type, DataContractJsonSerializer> returnTypeSerializers = new Dictionary<Type, DataContractJsonSerializer>();
 
         public NatsServiceSerializer()
         {
@@ -20,19 +21,34 @@ namespace Nats.Services.Core
                 }
                 if (methInfo.ReturnType != typeof(void))
                 {
-                    types.Add(methInfo.ReturnType);
+                    returnTypeSerializers.Add(methInfo.ReturnType, new DataContractJsonSerializer(methInfo.ReturnType));
                 }
             }
 
             serializer = new DataContractJsonSerializer(typeof(Dictionary<string, object>), types);
         }
 
-        public Dictionary<string, object> Deserialize(byte[] buffer)
+        public Dictionary<string, object> DeserializeMethodArguments(byte[] buffer)
         {
-            return DeserializeObject(buffer) as Dictionary<string, object>;
+            return DeserializeObject(serializer, buffer) as Dictionary<string, object>;
+        }
+        public byte[] SerializeMethodArguments(object obj)
+        {
+            return SerializeObject(serializer, obj);
         }
 
-        public object DeserializeObject(byte[] buffer)
+        public object DeserializeReturnObject(Type type, byte[] buffer)
+        {
+            DataContractJsonSerializer returnTypeSerializer = returnTypeSerializers[type];
+            return DeserializeObject(returnTypeSerializer, buffer);
+        }
+        public byte[] SerializeReturnObject(object obj)
+        {
+            DataContractJsonSerializer returnTypeSerializer = returnTypeSerializers[obj.GetType()];
+            return SerializeObject(returnTypeSerializer, obj);
+        }
+
+        public static object DeserializeObject(DataContractJsonSerializer serializer, byte[] buffer)
         {
             using (var stream = new MemoryStream(buffer))
             {
@@ -41,7 +57,7 @@ namespace Nats.Services.Core
             }
         }
 
-        public byte[] Serialize(object obj)
+        public static byte[] SerializeObject(DataContractJsonSerializer serializer, object obj)
         {
             if (obj == null)
             {
