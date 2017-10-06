@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nats.Services.Core", "Nats.Services.Core\Nats.Services.Core.csproj", "{B5F8CF26-2D9C-4DC1-83AC-2C90BC8CE3BC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nats.Services.Tests", "Nats.Services.Tests\Nats.Services.Tests.csproj", "{EDB39423-158E-4B80-A089-03EBBE0B2762}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoClient", "Nats.Services.Demo\DemoClient\DemoClient.csproj", "{C9656D1D-EAA9-446B-833F-C8BA9E510D5A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoServer", "Nats.Services.Demo\DemoServer\DemoServer.csproj", "{BBFD3D23-59BC-4487-AD51-EE7DC7FF754D}"
@@ -29,10 +27,6 @@ Global
 		{B5F8CF26-2D9C-4DC1-83AC-2C90BC8CE3BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5F8CF26-2D9C-4DC1-83AC-2C90BC8CE3BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5F8CF26-2D9C-4DC1-83AC-2C90BC8CE3BC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EDB39423-158E-4B80-A089-03EBBE0B2762}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EDB39423-158E-4B80-A089-03EBBE0B2762}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EDB39423-158E-4B80-A089-03EBBE0B2762}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EDB39423-158E-4B80-A089-03EBBE0B2762}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C9656D1D-EAA9-446B-833F-C8BA9E510D5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C9656D1D-EAA9-446B-833F-C8BA9E510D5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9656D1D-EAA9-446B-833F-C8BA9E510D5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
