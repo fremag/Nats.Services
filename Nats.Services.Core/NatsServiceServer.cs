@@ -22,7 +22,7 @@ namespace Nats.Services.Core
             this.connection = connection;
             this.serviceImpl = serviceImpl;
 
-            foreach(var methInfo in GetAllMethodInfos())
+            foreach(var methInfo in typeof(T).GetAllMethodInfos())
             {
                 var subject = GetListenSubject(methInfo);
                 var asyncSub = SubscribeAsync(subject, OnMessage);
@@ -30,10 +30,10 @@ namespace Nats.Services.Core
                 dicoMethodInfoBySubscription[asyncSub] = methInfo;
             }
 
-            if (GetAllEventInfos().Any())
+            if (typeof(T).GetAllEventInfos().Any())
             {
                 var scope = generator.ProxyBuilder.ModuleScope;
-                foreach(var eventInfo in GetAllEventInfos())
+                foreach(var eventInfo in typeof(T).GetAllEventInfos())
                 {
                     var delegType = eventInfo.EventHandlerType;
                     var delegGen = new DelegateProxyGenerator(scope, delegType);

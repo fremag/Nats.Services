@@ -90,45 +90,5 @@ namespace Nats.Services.Core
             subscriptions.Add(asyncSub);
             return asyncSub;
         }
-
-        protected EventInfo GetEventInfo(string eventName)
-        {
-            return GetAllEventInfos().FirstOrDefault(evt => evt.AddMethod.Name == eventName);
-        }
-
-        protected IEnumerable<EventInfo> GetAllEventInfos()
-        {
-            foreach(var evtInfo in typeof(T).GetEvents())
-            {
-                yield return evtInfo;
-            }
-            foreach (var interfaceType in typeof(T).GetInterfaces())
-            {
-                foreach (var evtInfo in interfaceType.GetEvents())
-                {
-                    yield return evtInfo;
-                }
-            }
-        }
-
-        protected MethodInfo GetMethodInfo(string methodName)
-        {
-            return GetAllMethodInfos().FirstOrDefault(meth => meth.Name == methodName);
-        }
-
-        protected IEnumerable<MethodInfo> GetAllMethodInfos()
-        {
-            foreach(var methInfo in typeof(T).GetMethods())
-            {
-                yield return methInfo;
-            }
-            foreach (var interfaceType in typeof(T).GetInterfaces())
-            {
-                foreach (var methInfo in interfaceType.GetMethods())
-                {
-                    yield return methInfo;
-                }
-            }
-        }
     }
 }

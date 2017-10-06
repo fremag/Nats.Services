@@ -1,7 +1,6 @@
 ﻿using System;
 using NATS.Client;
 using Castle.DynamicProxy;
-using System.Linq;
 using System.Reflection;
 using NLog;
 
@@ -20,7 +19,7 @@ namespace Nats.Services.Core
         {
             if (invocation.Method.IsSpecialName)
             {
-                var eventInfo = GetEventInfo(invocation.Method.Name);
+                var eventInfo = typeof(T).GetEventInfo(invocation.Method.Name);
                 if (eventInfo != null)
                 {
                     var deleg = invocation.Arguments[0] as MulticastDelegate;
@@ -32,7 +31,7 @@ namespace Nats.Services.Core
                 }
             }
 
-            if(GetMethodInfo(invocation.Method.Name) != null)
+            if(typeof(T).GetMethodInfo(invocation.Method.Name) != null)
             {
                 var payload = BuildPayload(invocation);
                 var subject = GetPublishSubject(invocation.Method);

@@ -13,7 +13,7 @@ namespace Nats.Services.Core
         public NatsServiceSerializer()
         {
             HashSet<Type> types = new HashSet<Type>();
-            foreach (var methInfo in typeof(T).GetMethods())
+            foreach (var methInfo in typeof(T).GetAllMethodInfos())
             {
                 foreach (var paramInfo in methInfo.GetParameters())
                 {
@@ -22,6 +22,15 @@ namespace Nats.Services.Core
                 if (methInfo.ReturnType != typeof(void))
                 {
                     returnTypeSerializers.Add(methInfo.ReturnType, new DataContractJsonSerializer(methInfo.ReturnType));
+                }
+            }
+
+            foreach (var evtInfo in typeof(T).GetAllEventInfos())
+            {
+                var methInfo = evtInfo.EventHandlerType.GetMethod(nameof(EventHandler.Invoke));
+                foreach (var paramInfo in methInfo.GetParameters())
+                {
+                    types.Add(paramInfo.ParameterType);
                 }
             }
 
