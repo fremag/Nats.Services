@@ -9,6 +9,7 @@ namespace Nats.Services.Core.KeyValueStoreService
         event Action<T_Value> ValueUpdated;
         event Action<T_Value> ValueDeleted;
 
+        T_Value GetByKey(T_Key key);
         List<T_Value> GetAllValues();
 
         void Insert(T_Value value);

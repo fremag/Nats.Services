@@ -24,5 +24,15 @@ namespace Nats.Services.Core.KeyValueStoreService
         {
             dicoKeyValues.Remove(value.Key);
         }
+
+        public override T_Value GetByKey(T_Key key)
+        {
+            if( dicoKeyValues.TryGetValue(key, out T_Value value))
+            {
+                return value;
+            }
+            return default(T_Value);
+        }
+        
     }
 }

@@ -9,6 +9,7 @@ namespace Nats.Services.Core.KeyValueStoreService
         public event Action<T_Value> ValueUpdated;
         public event Action<T_Value> ValueDeleted;
 
+        public abstract T_Value GetByKey(T_Key key);
         public abstract List<T_Value> GetAllValues();
         public abstract void DoInsert(T_Value value);
         public abstract void DoUpdate(T_Value value);
