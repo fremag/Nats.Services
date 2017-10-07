@@ -2,7 +2,6 @@
 using NATS.Client;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace Nats.Services.Core
@@ -24,7 +23,7 @@ namespace Nats.Services.Core
             var attrib = typeof(T).GetCustomAttribute<NatsServiceAttribute>();
             if (attrib == null)
             {
-                ServiceName = typeof(T).FullName;
+                ServiceName = typeof(T).Name;
             }
             else
             {
