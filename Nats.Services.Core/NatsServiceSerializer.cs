@@ -34,12 +34,12 @@ namespace Nats.Services.Core
                 }
             }
 
-            serializer = new DataContractJsonSerializer(typeof(Dictionary<string, object>), types);
+            serializer = new DataContractJsonSerializer(typeof(List<KeyValuePair<string, object>>), types);
         }
 
-        public Dictionary<string, object> DeserializeMethodArguments(byte[] buffer)
+        public List<KeyValuePair<string, object>> DeserializeMethodArguments(byte[] buffer)
         {
-            return DeserializeObject(serializer, buffer) as Dictionary<string, object>;
+            return DeserializeObject(serializer, buffer) as List<KeyValuePair<string, object>>;
         }
         public byte[] SerializeMethodArguments(object obj)
         {

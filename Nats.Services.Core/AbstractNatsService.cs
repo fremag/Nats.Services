@@ -1,6 +1,7 @@
 ﻿using Castle.DynamicProxy;
 using NATS.Client;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -51,14 +52,14 @@ namespace Nats.Services.Core
         public byte[] BuildPayload(IInvocation invoc)
         {
             var paramsInfo = invoc.Method.GetParameters();
-            var dico = new Dictionary<string, object>();
+            var args = new List<KeyValuePair<string, object>>();
             for(int i=0; i < paramsInfo.Length; i++)
             {
                 var paramInfo = paramsInfo[i];
                 var arg = invoc.Arguments[i];
-                dico[paramInfo.Name] = arg;
+                args.Add(new KeyValuePair<string, object>(paramInfo.Name, arg));
             }
-            var payload = serializer.SerializeMethodArguments(dico);
+            var payload = serializer.SerializeMethodArguments(args);
             return payload;
         }
 
@@ -71,13 +72,12 @@ namespace Nats.Services.Core
 
         public object[] DecodePayload(MethodInfo methInfo, byte[] payload)
         {
-            Dictionary<string, object> dico = serializer.DeserializeMethodArguments(payload);
+            IList<KeyValuePair<string, object>> args= serializer.DeserializeMethodArguments(payload);
             var parameters = methInfo.GetParameters();
             object[] values = new object[parameters.Length];
             for(int i=0; i < parameters.Length; i++)
             {
-                var param = parameters[i];
-                var value = dico[param.Name];
+                var value = args[i].Value;
                 values[i] = value;
             }
             return values;
