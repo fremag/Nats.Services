@@ -1,3 +1,4 @@
+using NFluent;
 using System;
 using Xunit;
 
@@ -8,7 +9,7 @@ namespace Nats.Services.Tests
         [Fact]
         public void Test1()
         {
-
+            Check.That(1+1).IsEqualTo(2);
         }
     }
 }
