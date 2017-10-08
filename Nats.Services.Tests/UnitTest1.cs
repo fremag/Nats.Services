@@ -1,5 +1,4 @@
 using NFluent;
-using System;
 using Xunit;
 
 namespace Nats.Services.Tests
