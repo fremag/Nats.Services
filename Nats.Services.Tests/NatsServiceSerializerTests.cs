@@ -8,11 +8,11 @@ namespace Nats.Services.Tests
 {
     public class NatsServiceSerializerTests
     {
-        NatsServiceSerializer<DummyService> serializer;
+        NatsServiceSerializer<IDummyService> serializer;
         List<KeyValuePair<string, object>> args;
         AnotherDummyClass anotherArg;
 
-        public interface DummyService
+        public interface IDummyService
         {
             void Log(List<DummyClass> obj);
             AnotherDummyClass Create(double x, int n);
@@ -20,7 +20,7 @@ namespace Nats.Services.Tests
 
         public NatsServiceSerializerTests()
         {
-            serializer = new NatsServiceSerializer<DummyService>();
+            serializer = new NatsServiceSerializer<IDummyService>();
             args = new List<KeyValuePair<string, object>>
             {
                 new KeyValuePair<string, object>("dummy1", new DummyClass { Name = "aaaaa", Id = 11 }),
@@ -49,7 +49,7 @@ namespace Nats.Services.Tests
         [Fact]
         public void SerializeMethodArgumentsExceptionTest()
         {
-            var serializer = new NatsServiceSerializer<DummyService>();
+            var serializer = new NatsServiceSerializer<IDummyService>();
 
             var args = new List<KeyValuePair<string, object>>
             {
