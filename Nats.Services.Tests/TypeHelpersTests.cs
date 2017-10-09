@@ -23,6 +23,9 @@ namespace Nats.Services.Tests
 
         [Theory]
         [InlineData(typeof(IDummyInterface), 4)]
+        [InlineData(typeof(IDummyInterfaceWithProperties), 0)]
+        [InlineData(typeof(IDummyInterfaceWithEvent), 1)]
+        [InlineData(typeof(IDummyInterfaceWithThreeEvents), 3)]
         public void TestGetAllEventInfos(Type type, int expectedNbEvents)
         {
             var events = type.GetAllEventInfos().ToArray();
