@@ -47,7 +47,7 @@ namespace Nats.Services.Tests
             connection.DidNotReceiveWithAnyArgs().SubscribeAsync(Arg.Any<string>());
             connection.DidNotReceiveWithAnyArgs().SubscribeAsync(Arg.Any<string>(), Arg.Any<string>());
             connection.DidNotReceiveWithAnyArgs().SubscribeAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<EventHandler<MsgHandlerEventArgs>>());
-            connection.Received().SubscribeAsync("TEST_AGENT.IDummyService.LogMessage", Arg.Any<EventHandler<MsgHandlerEventArgs>>());
+            connection.Received().SubscribeAsync("TEST_AGENT.IDummyService.MessageSent", Arg.Any<EventHandler<MsgHandlerEventArgs>>());
         }
 
         [Fact]
