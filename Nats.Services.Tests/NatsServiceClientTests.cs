@@ -28,28 +28,36 @@ namespace Nats.Services.Tests
             service = factory.BuildServiceClient<IDummyService>();
         }
 
+        /*
+         * Check that when service client is created, no subject is subscribed yet
+         */
         [Fact]
         public void CreationTest()
         {
-            // When service client is created, no subject is subscribed yet
             connection.DidNotReceiveWithAnyArgs().SubscribeAsync(Arg.Any<string>());
             connection.DidNotReceiveWithAnyArgs().SubscribeAsync(Arg.Any<string>(), Arg.Any<string>());
             connection.DidNotReceiveWithAnyArgs().SubscribeAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any< EventHandler < MsgHandlerEventArgs>>());
             connection.DidNotReceiveWithAnyArgs().SubscribeAsync(Arg.Any<string>(), Arg.Any<EventHandler<MsgHandlerEventArgs>>());
         }
 
+        /*
+         * Subscribe to an event and check he connection listens to the correct subject
+         */
         [Fact]
         public void EventSubscriptionTest()
         {
             service.MessageSent += Console.WriteLine;
 
-            // When service client is created, no subject is subscribed yet
             connection.DidNotReceiveWithAnyArgs().SubscribeAsync(Arg.Any<string>());
             connection.DidNotReceiveWithAnyArgs().SubscribeAsync(Arg.Any<string>(), Arg.Any<string>());
             connection.DidNotReceiveWithAnyArgs().SubscribeAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<EventHandler<MsgHandlerEventArgs>>());
             connection.Received().SubscribeAsync("TEST_AGENT.IDummyService.MessageSent", Arg.Any<EventHandler<MsgHandlerEventArgs>>());
         }
 
+        /*
+         * Check that a message is sent/published when a method is called
+         * Check the payload contains the serialized method arguments 
+         */
         [Fact]
         public void MethodCallTest()
         {
@@ -61,7 +69,6 @@ namespace Nats.Services.Tests
         
 
             byte[] payload = serializer.SerializeMethodArguments(args);
-            // When service client is created, no subject is subscribed yet
             connection.Received().Publish("TEST_AGENT.IDummyService.Log", Arg.Is<byte[]>(bytes => payload.SequenceEqual(bytes)));
         }
     }
