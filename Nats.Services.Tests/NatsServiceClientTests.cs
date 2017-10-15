@@ -1,5 +1,6 @@
 ﻿using Nats.Services.Core;
 using NATS.Client;
+using NFluent;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -20,12 +21,14 @@ namespace Nats.Services.Tests
         const string agentName = "TEST_AGENT";
         IConnection connection;
         IDummyService service;
+        NatsServiceSerializer<IDummyService> serializer;
 
         public NatsServiceClientTests()
         {
             connection = Substitute.For<IConnection>();
             NatsServiceFactory factory = new NatsServiceFactory(connection, agentName);
             service = factory.BuildServiceClient<IDummyService>();
+            serializer = new NatsServiceSerializer<IDummyService>();
         }
 
         /*
@@ -63,13 +66,27 @@ namespace Nats.Services.Tests
         {
             string msg = "Some message";
             service.Log(msg);
-            NatsServiceSerializer<IDummyService> serializer = new NatsServiceSerializer<IDummyService>();
             List<KeyValuePair<string, object>> args = new List<KeyValuePair<string, object>>();
             args.Add(new KeyValuePair<string, object>("message", msg));
         
 
             byte[] payload = serializer.SerializeMethodArguments(args);
             connection.Received().Publish("TEST_AGENT.IDummyService.Log", Arg.Is<byte[]>(bytes => payload.SequenceEqual(bytes)));
+        }
+
+        /*
+         * Check the method call result is correct
+         */ 
+        [Fact]
+        public void MethodCallWithResultTest()
+        {
+            byte[] payload = serializer.SerializeReturnObject(42);
+            Msg msg = new Msg("nothing", payload);
+            connection.Request(Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<int>()).Returns(msg);
+
+            string name = "John";
+            int id = service.GetId(name);
+            Check.That(id).IsEqualTo(42);
         }
     }
 }
