@@ -22,7 +22,7 @@ namespace Nats.Services.Core
             this.connection = connection;
             this.serviceImpl = serviceImpl;
 
-            foreach(var methInfo in typeof(T).GetAllMethodInfos())
+            foreach(var methInfo in typeof(T).GetAllMethodInfos().Where(mi => ! mi.IsSpecialName))
             {
                 var subject = GetListenSubject(methInfo);
                 var asyncSub = SubscribeAsync(subject, OnMessage);
@@ -60,7 +60,7 @@ namespace Nats.Services.Core
                 {
                     var payload = serializer.SerializeReturnObject(result);
                     if (logger.IsDebugEnabled) logger.Debug($"Method: {methInfo.Name}, Returns: {serializer.ToString(payload)}");
-                    asyncSub.Connection.Publish(e.Message.Reply, payload);
+                    connection.Publish(e.Message.Reply, payload);
                 }
             }
         }
