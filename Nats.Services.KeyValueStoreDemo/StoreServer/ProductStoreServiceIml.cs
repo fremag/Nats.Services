@@ -11,7 +11,7 @@ namespace StoreServer
     {
         private Random rand = new Random(0);
         static ILogger logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType.FullName);
-
+        Timer timer;
         public ProductStoreServiceIml()
         {
             Insert(new Product { Category = "Fruit", Key = "Orange", Price = 1, Quantity = 5 });
@@ -24,20 +24,25 @@ namespace StoreServer
             Insert(new Product { Category = "Vegetable", Key = "Carrots", Price = 1, Quantity = 5 });
             Insert(new Product { Category = "Vegetable", Key = "Pumpkin", Price = 1, Quantity = 5 });
             Insert(new Product { Category = "Vegetable", Key = "Spinach", Price = 1, Quantity = 5 });
+            for (int i = 0; i < 5000; i++)
+            {
+                Insert(new Product { Category = "Misc", Key = "Vegetable #"+i, Price = 1, Quantity = 5 });
+            }
 
-            Timer timer = new Timer(DoUpdateStore, this, 1000, 2000);
+            timer = new Timer(DoUpdateStore, this, 1000, 2000);
         }
 
         private void DoUpdateStore(object state)
         {
             var products = GetAllValues();
-            int idx = rand.Next(products.Count);
-            var product = products[idx];
+            foreach (var product in products)
+            {
 
-            product.Price += (1-rand.Next(3)) / 100d;
-            product.Quantity += rand.Next(2);
-//            logger.Info($"Update - {product}");
-            Update(product);
+                product.Price += (1 - rand.Next(3)) / 100d;
+                product.Quantity += rand.Next(2);
+                //            logger.Info($"Update - {product}");
+                Update(product);
+            }
         }
     }
 }
