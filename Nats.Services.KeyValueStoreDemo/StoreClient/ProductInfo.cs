@@ -4,9 +4,13 @@ using System;
 
 namespace StoreClient
 {
-    public class ProductInfo
+    public class ProductInfo : StoreRowItem<Product>
     {
         public Product Product { get; private set; }
+        public ProductInfo()
+        {
+
+        }
         public ProductInfo(Product product)
         {
             Product = product;
@@ -14,6 +18,11 @@ namespace StoreClient
         }
         public void Update(Product product)
         {
+            if( Product == null)
+            {
+                Product = product;
+                return;
+            }
             Product.Price = product.Price;
             Product.Quantity= product.Quantity;
             LastUpdate = DateTime.Now;

@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.objectListView1 = new BrightIdeasSoftware.ObjectListView();
+            this.objectListView1 = new BrightIdeasSoftware.FastObjectListView();
             ((System.ComponentModel.ISupportInitialize)(this.objectListView1)).BeginInit();
             this.SuspendLayout();
             // 
