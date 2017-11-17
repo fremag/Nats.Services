@@ -55,20 +55,20 @@ namespace StoreClient
 
         private void OnValueUpdated(Product product)
         {
+            if (productInfos == null) return; 
             var productInfo = productInfos.FirstOrDefault(pI => pI.Name == product.Name);
             if( productInfo != null)
             {
                 productInfo.Update(product);
-                objectListView1.UpdateObject(productInfo);
+                objectListView1.RefreshObject(productInfo);
             }
         }
 
         private void InitData(List<Product> products)
         {
             Text += $", {products.Count} products";
-            productInfos = products.Select(product => new ProductInfo(product)).ToList();
-            objectListView1.Objects = productInfos;
-            objectListView1.BuildGroups(objectListView1.GetColumn(nameof(ProductInfo.Category)), SortOrder.Ascending);
+            var tmp  = products.Select(product => new ProductInfo(product)).ToList();
+            productInfos = tmp;
         }
 
         public static string DiscoverServer(IConnection connection, ILogger logger=null, int periodMs=1000)
